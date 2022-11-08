@@ -1,12 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+
+    <script src="./node_modules/@microsoft/signalr/dist/browser/signalr.min.js"></script><!--Buradaki sıralama önemli.İlk önce signalR-->
+    <script src="jquery.min.js"></script><!--Buradaki sıralama önemli-->
+    
+    <script>
+     $(document).ready(()=>{
+
+        const connection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7265/myhub").build(); //BU CLİENTIN HANGİ SUNUCUYA BAĞLANACAĞINI BİLDİİRYORUZ.Bu da bizim oluşturdugumuz serverın ayağa kalktığı domaindşr.
+                                                                                                            //Bu server ismine server uygulamamızda bulunan launghsetting.jsondan bulabiliriz.
+      connection.start();
+
+
+      $("#btnGonder").click(()=>{
+        console.log("butona tıklandı");
+         let message = $("#textMessage").val();
+      
+         connection.invoke("SendMessageAsync",message);
+        });
+    })
+
+   
+
+    //server kısmında Cors politikaları için gerekli olan methodu program.cs de izin vermem gerekir.
+    </script>
+
+
+
+    <title>SingalR</title>
 </head>
 <body>
-    
+    <input id="textMessage"type="text">
+    <button id="btnGonder">Gönder</button>
 </body>
 </html>
