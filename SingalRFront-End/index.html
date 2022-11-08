@@ -8,17 +8,98 @@
     <script>
      $(document).ready(()=>{
 
-        const connection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7265/myhub").build(); //BU CLİENTIN HANGİ SUNUCUYA BAĞLANACAĞINI BİLDİİRYORUZ.Bu da bizim oluşturdugumuz serverın ayağa kalktığı domaindşr.
-                                                                                                            //Bu server ismine server uygulamamızda bulunan launghsetting.jsondan bulabiliriz.
-      connection.start();
+        const connection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7265/myhub") //server adresimiz ve hub sınıfının ismi. Bunu server tarafında program.cs de belirtmiştik
+        //İlk başta yaptığımız bağlanma server calısırken tek seferlik bir bağlanma ve server run edilmemişse hata döndürüyordu yani 
+        //direk clientta withurlden sonra build() yapmıştık. Eğerki bir bağlantı kuralamıyor veya sürecte var olan baglantı kopuyorsa 
+        //biz bunu tekarlı bir şekilde otomatik bağlantı talebi yapacak şekilde ayarlamak için  belirli periyotlar ile istek göndrerek yapıcağız.
+        .withAutomaticReconnect() /* bu fonksiyon her zaman build edilmeden önce olmalıdır.Bu fonksiyon baglantı var sonrasında koptugunda kullanılmak için 
+                                  ilk bağlantı kesilmesinde default olarak  0saniye, sonra 2 ,10,30 saniye aralıklarla bağlanma isteği yapar.
+                                 Bğlantı hiç sağlanmaz ise bir daha reconnect yapmaz.Bu bağlantı süresini kendimizde beliryebiliriz. 
+                                 Örn /   .withAutomaticReconnect([1000,2000,3000,4000,15000]) vs. */
+        .build(); //BU CLİENTIN HANGİ SUNUCUYA BAĞLANACAĞINI BİLDİİRYORUZ.Bu da bizim oluşturdugumuz serverın ayağa kalktığı domaindşr.//Bu server ismine server uygulamamızda bulunan launghsetting.jsondan bulabiliriz.
+      
+      
+        // connection.start(); ilk başta bunu yaptık ama sonrasında start fonsiyonunu direk kendimiz yapınca bunada gerek kalmadı.
+      
+        //Bğlantı client ile server hub arasında hiç kurulamadığında gerçekleşicek olan fonksiyonumuz.Yani client hiç daha huba bağlanamamışken. 
+        async function start()
+        {
+            try {
+                    
+                await connection.start();
 
 
-      $("#btnGonder").click(()=>{
+            }catch (error){
+                setTimeout(()=> start(), 2000); //bu saniye aralıkları ile startı çalıştır.
+            }
+
+        }
+        start();
+
+        const durum = $("#durum");
+      //Bağlantı sağlanmaya çalışılıyorken 
+        connection.onreconnecting(error=>{
+            durum.css("background-color","blue"); //bağlantı sağlanmaya çalışılıyorken mavi olssun
+            durum.css("color","white");  
+            durum.html("Bağlantı kuruluyor");
+            durum.fadeIn(2000, ()=>{
+                setTimeout(()=>{
+                    durum.fadeOut(2000);
+                })
+            })
+
+        });
+        //Bağlantı sağlandığında
+        connection.onreconnected(connectionId=>{
+            durum.css("background-color","green"); 
+            durum.css("color","white");  
+            durum.html("Bağlantı KURULDU");
+            durum.fadeIn(2000, ()=>{
+                setTimeout(()=>{
+                    durum.fadeOut(2000);
+                })
+            })
+      
+
+        });    
+
+        //periyorlar bittikten sonra tetiklenir.
+        connection.onclose(error=>{
+            durum.css("background-color","red"); 
+            durum.css("color","white");  
+            durum.html("Bağlantı KURULAMADI");
+            durum.fadeIn(2000, ()=>{
+                setTimeout(()=>{
+                    durum.fadeOut(2000);
+                })
+            })
+      
+
+        });
+
+
+        $("#btnGonder").click(()=>{
         console.log("butona tıklandı");
          let message = $("#textMessage").val();
-      
+         //mesajlarımızı server hub methodumuza gönderiyoruz.
          connection.invoke("SendMessageAsync",message);
         });
+
+        //Sserver hub methodumuzda belirttiğimiz client(browser) tarafında tetklenilenileck olan  methodumuz "receiveMessage"
+        connection.on("receiveMessage", message=>{
+        $("#mesajlar").append(message + "<h2>");
+
+        })
+
+        //Client ile serverın arasındaki bağlantının gerçekleşmesi durumuna göre fırlatılan eventler aşağıdadır.
+
+        /* Onreconnecting : Yeniden bağlanma girişimlerini başlatmadan önce fırlatılan/tetiklenen event. Kopan bağlantının yeniden sağlayabilmek için talepten önce bu event fırlatılır.
+          Bağlantı sağlanmadan önce gerekli cookilerde vs temizlik yapılaması için 
+             */  
+       //Onreconnecre: Yeniden bağlantı gerçekleştiğpinde tetiklenen fonksiyondur.
+       
+       //Onclose : Yeniden bağlantı girişimlerinin sonucsuz kaldığı durumlarda fırlatılır.
+
     })
 
    
@@ -31,7 +112,10 @@
     <title>SingalR</title>
 </head>
 <body>
+
+    <div id="durum" style="display:none ;"></div>
     <input id="textMessage"type="text">
     <button id="btnGonder">Gönder</button>
+    <div id="mesajlar"></div>
 </body>
 </html>
