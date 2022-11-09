@@ -36,17 +36,23 @@
         }
         start();
 
+        //animasyon için fonksiyonumuz
+        function animation(){
+            durum.fadeIn(2000, ()=>{
+                setTimeout(()=>{
+                    durum.fadeOut(2000);
+                })
+            })
+
+        }
+
         const durum = $("#durum");
       //Bağlantı sağlanmaya çalışılıyorken 
         connection.onreconnecting(error=>{
             durum.css("background-color","blue"); //bağlantı sağlanmaya çalışılıyorken mavi olssun
             durum.css("color","white");  
             durum.html("Bağlantı kuruluyor");
-            durum.fadeIn(2000, ()=>{
-                setTimeout(()=>{
-                    durum.fadeOut(2000);
-                })
-            })
+            animation();
 
         });
         //Bağlantı sağlandığında
@@ -54,11 +60,7 @@
             durum.css("background-color","green"); 
             durum.css("color","white");  
             durum.html("Bağlantı KURULDU");
-            durum.fadeIn(2000, ()=>{
-                setTimeout(()=>{
-                    durum.fadeOut(2000);
-                })
-            })
+            animation();
       
 
         });    
@@ -68,14 +70,29 @@
             durum.css("background-color","red"); 
             durum.css("color","white");  
             durum.html("Bağlantı KURULAMADI");
-            durum.fadeIn(2000, ()=>{
-                setTimeout(()=>{
-                    durum.fadeOut(2000);
-                })
-            })
+            animation();
       
 
         });
+
+        //Eğerki server tarafında bulunan huba bir client baglantı sağladıysa ilk burası karşılıyacak
+        connection.on("userJoined",connectionId=>{
+            //bağlanan ıd server trafından bize gönderilecek , bide bu ıdyi şimdilik html içeriğimizde göstericez
+            durum.html(`${connectionId} bağlandı`)
+            durum.css("background-color","green") //giriş oldugunda yeşil olsun
+            animation();
+
+
+        })
+
+        //Burada da herhangi birclient sistemden ayrıldığında diğer clientlara göstermek için kullandıgımız method
+        connection.on("userLeaved",connectionId=>{
+            durum.html(`${connectionId} bağlandı`)
+            durum.css("background-color","red")//çıkıs  oldugunda kırmzı olsun
+            animation();
+
+
+        })
 
 
         $("#btnGonder").click(()=>{
