@@ -93,6 +93,15 @@
 
 
         })
+    
+         //Server tarafından bağlı olan clientların ,gönderilen client bilgilerinin alındııgı fonksiyon
+        connection.on("clients",clientsData=>{
+            let text ="";
+            $.each(clientsData , (index,item)=>{
+                text= `<li>${item}</li>`;                
+            });
+            $("#clients").html(text);
+        })
 
 
         $("#btnGonder").click(()=>{
