@@ -1,3 +1,4 @@
+using SingalRServerExample.Business;
 using SingalRServerExample.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,8 +15,12 @@ builder.Services.AddCors(options => options.AddDefaultPolicy(policy =>
 
 ));
 
+//Business sýnfýnda ctor da istenilen ýhubcontext .net içinden gelen signalr kütüphanesinden alýnacak ve nesnesi üretilip verilecek.
+builder.Services.AddTransient<MyBusiness>();
+
 //SingalR modulünü çaðýrarak iþlevsel hale getiriyoruz.
 builder.Services.AddSignalR();
+builder.Services.AddControllers();  
 
 
 var app = builder.Build();
@@ -36,6 +41,7 @@ app.UseEndpoints(endpoints =>
 
     //Uygulamada maphub tarafýndan bir istek geliyorsa bu sýnýf tarafýndan karþýlanýcak diyoruz.
     endpoints.MapHub<MyHub>("/myhub");
+    endpoints.MapControllers(); //APÝ CONTROLLER ÝÞLEMELERÝ ÝÇÝN 
 });
 
 

@@ -1,21 +1,22 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using SingalRServerExample.Interface;
 
 namespace SingalRServerExample.Hubs
 {
 
     //Sınıfın ismine sadece sonuna hub yazmak yetmez ,  birde Hub sınıfından kalıtım alması gerekir. 
-    public class MyHub :Hub
+    public class MyHub :Hub<IMessageClient>
     {
         //giriş yapan clientları koleksiyonumuza ekliyoruz.
         static List<string> clients = new List<string>();   
 
-
+        //İşlemlerimizi artık business kısmına tasıdık.
         //Kendi fonksiyonumuz.Gelen mesajı karşılayacak
-        public async Task SendMessageAsync(string message)
-        {
-            //Clients Hub sınıfından gelir.SendAsync , clientlarda hangi methodun tetikleneceğini ilk parametresinde ister ve clientın gönderdiği mesajı ister.
-           await  Clients.All.SendAsync("receiveMessage", message);
-        }
+        //public async Task SendMessageAsync(string message)
+        //{
+        //    //Clients Hub sınıfından gelir.SendAsync , clientlarda hangi methodun tetikleneceğini ilk parametresinde ister ve clientın gönderdiği mesajı ister.
+        //   await  Clients.All.SendAsync("receiveMessage", message);
+        //}
 
 
 
@@ -30,10 +31,17 @@ namespace SingalRServerExample.Hubs
             
             
             clients.Add(Context.ConnectionId);//clientı yakalayıp listeye IDsini ekledik.
-            await Clients.All.SendAsync("clients",clients); //mevcut tüm clientları haberdar edicek yani client tarafında bu method çalıştıırlacak diyorum.
-            await Clients.All.SendAsync("userJoined", Context.ConnectionId);
-       
-            
+
+            // Hub < IMessageClient > interface eklendikten sonra bunlara gerek kalmadı
+            //  await Clients.All.SendAsync("clients",clients); //mevcut tüm clientları haberdar edicek yani client tarafında bu method çalıştıırlacak diyorum.
+            // await Clients.All.SendAsync("userJoined", Context.ConnectionId);
+
+            //IMessageClientdan gelen methotlar
+            //bu methodalrı interface de oluşturup kullanmamızın amacı herhangi bir yazım yanlışını engelemek içindir.
+          await  Clients.All.Clients(clients);
+            await Clients.All.UserJoined(Context.ConnectionId);
+            await Clients.All.UserLeaved(Context.ConnectionId);
+
 
         }
 
@@ -43,9 +51,17 @@ namespace SingalRServerExample.Hubs
         {
 
             clients.Add(Context.ConnectionId);//clientı yakalayıp listeye IDsini ekledik.
-            await Clients.All.SendAsync("clients", clients); //mevcut tüm clientları haberdar edicek yani client tarafında bu method çalıştıırlacak diyorum.
 
-            await Clients.All.SendAsync("userLeaved", Context.ConnectionId);
+            //IMessageClientdan gelen methotlar
+            //bu methodalrı interface de oluşturup kullanmamızın amacı herhangi bir yazım yanlışını engelemek içindir.
+            await Clients.All.Clients(clients);
+            await  Clients.All.UserJoined(Context.ConnectionId);
+            await  Clients.All.UserLeaved(Context.ConnectionId);
+
+            // Hub < IMessageClient > interface eklendikten sonra bunlara gerek kalm
+            //await Clients.All.SendAsync("clients", clients); //mevcut tüm clientları haberdar edicek yani client tarafında bu method çalıştıırlacak diyorum.
+
+            //await Clients.All.SendAsync("userLeaved", Context.ConnectionId);
 
 
         }
