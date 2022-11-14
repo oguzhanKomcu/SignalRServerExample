@@ -8,7 +8,7 @@
     <script>
      $(document).ready(()=>{
 
-        const connection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7265/myhub") //server adresimiz ve hub sınıfının ismi. Bunu server tarafında program.cs de belirtmiştik
+        const connection = new signalR.HubConnectionBuilder().withUrl("https://localhost:7265/messagehub") //server adresimiz ve hub sınıfının ismi. Bunu server tarafında program.cs de belirtmiştik
         //İlk başta yaptığımız bağlanma server calısırken tek seferlik bir bağlanma ve server run edilmemişse hata döndürüyordu yani 
         //direk clientta withurlden sonra build() yapmıştık. Eğerki bir bağlantı kuralamıyor veya sürecte var olan baglantı kopuyorsa 
         //biz bunu tekarlı bir şekilde otomatik bağlantı talebi yapacak şekilde ayarlamak için  belirli periyotlar ile istek göndrerek yapıcağız.
@@ -16,7 +16,7 @@
                                   ilk bağlantı kesilmesinde default olarak  0saniye, sonra 2 ,10,30 saniye aralıklarla bağlanma isteği yapar.
                                  Bğlantı hiç sağlanmaz ise bir daha reconnect yapmaz.Bu bağlantı süresini kendimizde beliryebiliriz. 
                                  Örn /   .withAutomaticReconnect([1000,2000,3000,4000,15000]) vs. */
-        .build(); //BU CLİENTIN HANGİ SUNUCUYA BAĞLANACAĞINI BİLDİİRYORUZ.Bu da bizim oluşturdugumuz serverın ayağa kalktığı domaindşr.//Bu server ismine server uygulamamızda bulunan launghsetting.jsondan bulabiliriz.
+        .build(); ////BU CLİENTIN HANGİ SUNUCUYA BAĞLANACAĞINI BİLDİİRYORUZ.Bu da bizim oluşturdugumuz serverın ayağa kalktığı domaindşr.//Bu server ismine server uygulamamızda bulunan launghsetting.jsondan bulabiliriz.
       
       
         // connection.start(); ilk başta bunu yaptık ama sonrasında start fonsiyonunu direk kendimiz yapınca bunada gerek kalmadı.

@@ -41,6 +41,7 @@ app.UseEndpoints(endpoints =>
 
     //Uygulamada maphub tarafýndan bir istek geliyorsa bu sýnýf tarafýndan karþýlanýcak diyoruz.
     endpoints.MapHub<MyHub>("/myhub");
+    endpoints.MapHub<MessageHub>("/messagehub");
     endpoints.MapControllers(); //APÝ CONTROLLER ÝÞLEMELERÝ ÝÇÝN 
 });
 
