@@ -2,7 +2,7 @@
 
 namespace SingalRServerExample.Hubs
 {
-    //Bu messageHub sınıfımızı oluşturduktan sonra unutmamak gerekir ki programcs de bunu tanımlamamız gerekmektedir.
+    //Bu messageHub sınıfımızı oluşturduktan sonra unutmamak gerekir ki programcs de bunu tanımlamamız gerekmektedir...
     public class MessageHub :Hub
     {
         public async Task SendMessageAsync(string message)
